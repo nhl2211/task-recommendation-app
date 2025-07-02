@@ -1,55 +1,75 @@
-# -*- coding: utf-8 -*-
-
+import streamlit as st
 import pandas as pd
-df = pd.read_csv("task_recommendation_dataset.csv")
-df.head()
 from sklearn.feature_extraction.text import TfidfVectorizer
-
-# Use Description column to create features
-vectorizer = TfidfVectorizer()
-tfidf_matrix = vectorizer.fit_transform(df["Description"])
 from sklearn.metrics.pairwise import cosine_similarity
+from textblob import TextBlob
+from datetime import datetime
 
-# Compute similarity matrix (every task compared to every other task)
-cosine_sim = cosine_similarity(tfidf_matrix, tfidf_matrix)
+# Load dataset
+df = pd.read_csv("task_recommendation_dataset.csv")
 
-# Display sample: similarity of Task 1 to all tasks
-import numpy as np
-print("Similarity of Task 1 to others:\n", np.round(cosine_sim[0], 2))
-# Let's recommend similar tasks for Task ID 1 (index 0)
-task_index = 0  # Task ID 1
+# TF-IDF Vectorization with N-grams for improved text representation
+vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
+tfidf_matrix = vectorizer.fit_transform(df['Description'])
+cosine_sim = cosine_similarity(tfidf_matrix)
 
-# Get pairwise similarities for this task
-similar_scores = list(enumerate(cosine_sim[task_index]))
+# Streamlit UI setup
+st.set_page_config(page_title="Advanced Task Recommendation System")
+st.title("🧠 AI-Powered Task Recommendation System")
+st.markdown("This system recommends tasks to team members based on task similarity, sentiment, and past history.")
 
-# Sort tasks by similarity score
-similar_tasks = sorted(similar_scores, key=lambda x: x[1], reverse=True)
+# Sidebar filters
+with st.sidebar:
+    st.header("🔍 Filter Options")
+    users = df["Assigned To"].unique().tolist()
+    selected_user = st.selectbox("Select a user:", users)
+    filter_priority = st.multiselect("Select priority levels:", df["Priority"].unique(), default=df["Priority"].unique())
+    filter_category = st.multiselect("Select categories:", df["Category"].unique(), default=df["Category"].unique())
 
-# Display top 3 most similar tasks (excluding itself)
-print("\nTop 3 similar tasks:")
-for i in similar_tasks[1:4]:
-    print(f"Task ID: {df.iloc[i[0]]['Task ID']}, Similarity: {i[1]:.2f}, Description: {df.iloc[i[0]]['Description']}")
+# Filtered tasks based on sidebar
+filtered_df = df[(df['Priority'].isin(filter_priority)) & (df['Category'].isin(filter_category))]
 
-# Choose a user
-target_user = "Alice"
+# Recommend button
+if st.button("🔎 Get Personalized Recommendations"):
+    user_tasks = df[df['Assigned To'] == selected_user].index.tolist()
+    candidate_tasks = filtered_df[filtered_df['Assigned To'] != selected_user].index.tolist()
 
-# Get task indexes for tasks Bob has worked on
-user_task_indexes = df[df['Assigned To'] == target_user].index.tolist()
+    recommendations = []
+    for i in candidate_tasks:
+        sim_scores = [cosine_sim[i][j] for j in user_tasks if j in cosine_sim[i]]
+        if sim_scores:
+            avg_score = sum(sim_scores) / len(sim_scores)
+            recommendations.append((i, avg_score))
 
-# Get all other (unassigned or assigned to others) task indexes
-other_tasks = df[df['Assigned To'] != target_user].index.tolist()
+    top_recommendations = sorted(recommendations, key=lambda x: x[1], reverse=True)[:5]
+    result_rows = []
 
-# Average similarity of other tasks to Bob's tasks
-recommendations = []
-for i in other_tasks:
-    sim_scores = [cosine_sim[i][j] for j in user_task_indexes]
-    avg_score = sum(sim_scores) / len(sim_scores)
-    recommendations.append((i, avg_score))
+    st.markdown(f"### 📌 Top 5 Task Suggestions for **{selected_user}**")
+    for idx, score in top_recommendations:
+        task = df.iloc[idx]
+        description = task['Description']
+        sentiment_score = TextBlob(description).sentiment.polarity
+        sentiment = "😊 Positive" if sentiment_score > 0.2 else "😟 Negative" if sentiment_score < -0.2 else "😐 Neutral"
 
-# Sort and show top 5 recommendations
-top_recommendations = sorted(recommendations, key=lambda x: x[1], reverse=True)[:5]
+        st.markdown(f"- **Task ID {task['Task ID']}** ({task['Category']} - {task['Priority']})<br>"
+                    f"  ➤ *{description}*<br>"
+                    f"  🔁 Similarity Score: `{score:.2f}`<br>"
+                    f"  💬 Sentiment: **{sentiment}**<br>"
+                    f"  📅 Deadline: {task['Deadline']}",
+                    unsafe_allow_html=True)
 
-print(f"\n📌 Top 5 recommended tasks for {target_user}:\n")
-for idx, score in top_recommendations:
-    task = df.iloc[idx]
-    print(f"Task ID: {task['Task ID']}, Similarity: {score:.2f}, Description: {task['Description']}")
+        result_rows.append({
+            "Task ID": task['Task ID'],
+            "Description": description,
+            "Category": task['Category'],
+            "Priority": task['Priority'],
+            "Similarity": round(score, 2),
+            "Sentiment": sentiment,
+            "Deadline": task['Deadline']
+        })
+
+    result_df = pd.DataFrame(result_rows)
+    csv = result_df.to_csv(index=False).encode('utf-8')
+    st.download_button("📥 Download Recommendations", data=csv, file_name=f"recommendations_{selected_user}.csv", mime="text/csv")
+
+  
