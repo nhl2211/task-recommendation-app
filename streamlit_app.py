@@ -73,7 +73,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h3 class='header-text'>🤖 AI-Powered Task Recommendation System</h3>", unsafe_allow_html=True)
+st.markdown("<h2 class='header-text'>🤖 AI-Powered Task Recommendation System</h2>", unsafe_allow_html=True)
 st.markdown("Use AI to generate personalized task suggestions for team members based on task descriptions, category, and priority.")
 
 # Sidebar filters
@@ -95,6 +95,7 @@ with st.sidebar:
         st.session_state['reset'] = True
     filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
     filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
+    show_all = st.checkbox("Show all recommendations", value=False)
 
 # Filtered tasks based on sidebar
 filtered_df = df[(df['Priority'].isin(filter_priority)) & (df['Category'].isin(filter_category))]
@@ -120,14 +121,16 @@ with col1:
                     recommendations.append((i, avg_score))
 
             priority_rank = {'High': 3, 'Medium': 2, 'Low': 1}
-            top_recommendations = sorted(recommendations, key=lambda x: (priority_rank.get(df.iloc[x[0]]['Priority'], 0), -x[1]), reverse=True)[:6]
+            top_recommendations = sorted(recommendations, key=lambda x: (priority_rank.get(df.iloc[x[0]]['Priority'], 0), -x[1]), reverse=True)
+            if not show_all:
+                top_recommendations = top_recommendations[:6]
             tasks_to_display = []
             for idx, score in top_recommendations:
                 task = df.iloc[idx].to_dict()
                 task['Similarity'] = round(score, 2)
                 tasks_to_display.append(task)
 
-        st.subheader(f"📌 Top 6 Task Suggestions for {selected_user}")
+        st.subheader(f"📌 Task Suggestions for {selected_user}")
         for task in tasks_to_display:
             description = task['Description']
             sentiment_score = TextBlob(description).sentiment.polarity
