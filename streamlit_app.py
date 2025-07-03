@@ -120,7 +120,7 @@ with col1:
                     recommendations.append((i, avg_score))
 
             priority_rank = {'High': 3, 'Medium': 2, 'Low': 1}
-                top_recommendations = sorted(recommendations, key=lambda x: (priority_rank.get(df.iloc[x[0]]['Priority'], 0), -x[1]), reverse=True)[:6]
+            top_recommendations = sorted(recommendations, key=lambda x: (priority_rank.get(df.iloc[x[0]]['Priority'], 0), -x[1]), reverse=True)[:6]
             tasks_to_display = []
             for idx, score in top_recommendations:
                 task = df.iloc[idx].to_dict()
