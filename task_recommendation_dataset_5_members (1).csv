@@ -1,0 +1,19 @@
+Task ID,Description,Category,Priority,Assigned To
+1,Fix security vulnerability in login module,Bug,High,Alice
+2,Implement two-factor authentication,Feature,High,Bob
+3,Urgent bug in checkout process,Bug,High,Charlie
+4,Integrate Stripe payment gateway,Feature,Medium,David
+5,Refactor user profile component,Refactor,Medium,Eve
+6,Optimize database queries for reports,Performance,Medium,Alice
+7,Write blog post on recent AI trends,Content,Medium,Bob
+8,Design new homepage layout,Design,Medium,Charlie
+9,Create user onboarding documentation,Documentation,Medium,David
+10,Update privacy policy,Legal,Low,Eve
+11,Analyze user feedback survey,Research,Low,Alice
+12,Organize team knowledge base,Organization,Low,Bob
+13,Change footer background color,Design,Low,Charlie
+14,Add alt tags to all images,SEO,Low,David
+15,Update favicon for branding,Branding,Low,Eve
+16,Reformat markdown in README file,Documentation,Low,Alice
+17,Test CSS styles in Safari browser,Testing,Low,Bob
+18,Check broken internal links on FAQ page,SEO,Low,Charlie
