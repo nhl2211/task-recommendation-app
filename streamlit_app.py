@@ -73,7 +73,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h4 class='header-text'>🤖 AI-Powered Task Recommendation System</h4>", unsafe_allow_html=True)
+st.markdown("<h2 class='header-text'>🤖 AI-Powered Task Recommendation System</h2>", unsafe_allow_html=True)
 st.markdown("Use AI to generate personalized task suggestions for team members based on task descriptions, category, and priority.")
 
 # Sidebar filters
@@ -163,7 +163,7 @@ with col1:
         st.download_button("📥 Download Recommendations", data=csv, file_name=f"recommendations_{selected_user}_final.csv", mime="text/csv")
 
 with col2:
-    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712109.png", width=250)
+    st.image("https://cdn-icons-png.flaticon.com/512/4712/4712109.png", width=150)
     st.markdown("""
         <div class='info-panel'>
             <p>This tool helps project managers and team leads assign relevant tasks using machine learning recommendations.</p>
