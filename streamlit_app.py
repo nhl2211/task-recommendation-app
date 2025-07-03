@@ -112,7 +112,7 @@ with col1:
             fallback_tasks = filtered_df.groupby('Priority', group_keys=False).apply(lambda x: x.sample(min(2, len(x)))).sample(n=min(6, len(filtered_df)))
             tasks_to_display = fallback_tasks.to_dict('records')
         else:
-            candidate_tasks = filtered_df[filtered_df['Assigned To'] != selected_user].index.tolist()
+            candidate_tasks = df.index[df['Assigned To'] != selected_user].tolist()
             recommendations = []
             for i in candidate_tasks:
                 sim_scores = [cosine_sim[i, j] for j in user_tasks]
