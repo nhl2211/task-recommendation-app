@@ -10,15 +10,16 @@ df['Description'] = df['Description'].astype(str).str.lower()
 
 # TF-IDF Vectorization
 from nltk.corpus import stopwords
-from nltk.tokenize import word_tokenize
 import nltk
-nltk.download('punkt')
 nltk.download('stopwords')
 stop_words = set(stopwords.words('english'))
 
+import re
+
 def clean_text(text):
-    words = word_tokenize(text)
-    return ' '.join([w for w in words if w.isalnum() and w not in stop_words])
+    words = re.findall(r'\b\w+\b', text.lower())
+    return ' '.join([w for w in words if w not in stop_words])
+
 
 df['Cleaned_Description'] = df['Description'].apply(clean_text)
 vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
