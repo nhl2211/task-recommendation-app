@@ -28,6 +28,10 @@ cosine_sim = cosine_similarity(tfidf_matrix)
 
 # Streamlit UI setup
 st.set_page_config(page_title="AI Task Recommender", layout="wide")
+
+if 'reset' in st.session_state and st.session_state['reset']:
+    st.session_state['reset'] = False
+    st.experimental_rerun()
 st.markdown("""
     <style>
     body {
@@ -88,7 +92,7 @@ with st.sidebar:
     selected_user = st.selectbox("Select a team member:", users)
     
     if st.button("🔁 Reset Filters"):
-        st.experimental_rerun()
+        st.session_state['reset'] = True
     filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
     filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
 
@@ -115,7 +119,8 @@ with col1:
                     avg_score = sum(sim_scores) / len(sim_scores)
                     recommendations.append((i, avg_score))
 
-            top_recommendations = sorted(recommendations, key=lambda x: (df.iloc[x[0]]['Priority'], -x[1]), reverse=True)[:6]
+            priority_rank = {'High': 3, 'Medium': 2, 'Low': 1}
+                top_recommendations = sorted(recommendations, key=lambda x: (priority_rank.get(df.iloc[x[0]]['Priority'], 0), -x[1]), reverse=True)[:6]
             tasks_to_display = []
             for idx, score in top_recommendations:
                 task = df.iloc[idx].to_dict()
@@ -162,4 +167,3 @@ with col2:
             <p><b>Tip:</b> Adjust priority or category filters to explore different task matches.</p>
         </div>
     """, unsafe_allow_html=True)
-
