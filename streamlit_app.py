@@ -86,9 +86,7 @@ with st.sidebar:
     st.markdown("## 🎛️ Filters", unsafe_allow_html=True)
     users = df["Assigned To"].unique().tolist()
     selected_user = st.selectbox("Select a team member:", users)
-    filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
-    filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
-
+    
     if st.button("🔁 Reset Filters"):
         st.experimental_rerun()
     filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
@@ -164,3 +162,4 @@ with col2:
             <p><b>Tip:</b> Adjust priority or category filters to explore different task matches.</p>
         </div>
     """, unsafe_allow_html=True)
+
