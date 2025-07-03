@@ -84,6 +84,7 @@ with st.sidebar:
     """, unsafe_allow_html=True)
 
     st.markdown("## 🎛️ Filters", unsafe_allow_html=True)
+    users = df["Assigned To"].unique().tolist()
     selected_user = st.selectbox("Select a team member:", users)
     filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
     filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
