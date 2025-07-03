@@ -23,7 +23,7 @@ def clean_text(text):
 
 df['Cleaned_Description'] = df['Description'].apply(clean_text)
 vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['Description'])
+tfidf_matrix = vectorizer.fit_transform(df['Cleaned_Description'])
 cosine_sim = cosine_similarity(tfidf_matrix)
 
 # Streamlit UI setup
@@ -73,7 +73,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h2 class='header-text'>🤖 AI-Powered Task Recommendation System</h2>", unsafe_allow_html=True)
+st.markdown("<h4 class='header-text'>🤖 AI-Powered Task Recommendation System</h4>", unsafe_allow_html=True)
 st.markdown("Use AI to generate personalized task suggestions for team members based on task descriptions, category, and priority.")
 
 # Sidebar filters
