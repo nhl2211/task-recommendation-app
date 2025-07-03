@@ -31,14 +31,14 @@ st.set_page_config(page_title="AI Task Recommender", layout="wide")
 st.markdown("""
     <style>
     body {
-        background-color: #121212;
-        color: #e0e0e0;
+        background-color: #ffffff;
+        color: #333333;
     }
     .main {
-        background-color: #121212;
+        background-color: #ffffff;
     }
     .stButton>button {
-        background-color: #673ab7;
+        background-color: #4b79a1;
         color: white;
         font-weight: 600;
         border-radius: 6px;
@@ -46,24 +46,25 @@ st.markdown("""
         transition: 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #512da8;
+        background-color: #3a5e84;
     }
     .recommendation-box {
-        background-color: #1e1e1e;
-        border: 1px solid #3c3c3c;
+        background-color: #f7faff;
+        border: 1px solid #dde5f1;
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 15px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
+        color: #333333;
+        box-shadow: 0 2px 5px rgba(0, 0, 0, 0.05);
     }
     .header-text {
         font-size: 1.7rem;
-        color: #bb86fc;
+        color: #2e5c9a;
     }
     .info-panel {
         font-size: 0.9em;
         padding-top: 1em;
-        color: #cccccc;
+        color: #555555;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -73,13 +74,24 @@ st.markdown("Use AI to generate personalized task suggestions for team members b
 
 # Sidebar filters
 with st.sidebar:
-    
+    st.markdown("""
+    <style>
+    .sidebar-content label, .sidebar-content div {
+        font-size: 0.92rem;
+        color: #2e5c9a;
+    }
+    </style>
+    """, unsafe_allow_html=True)
 
-    st.header("🔍 Customize Filters")
-    users = df["Assigned To"].unique().tolist()
-    selected_user = st.selectbox("👤 Select a team member:", users)
-    filter_priority = st.multiselect("🚦 Priority:", df["Priority"].unique(), default=df["Priority"].unique())
-    filter_category = st.multiselect("🗂️ Category:", df["Category"].unique(), default=df["Category"].unique())
+    st.markdown("## 🎛️ Filters", unsafe_allow_html=True)
+    selected_user = st.selectbox("Select a team member:", users)
+    filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
+    filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
+
+    if st.button("🔁 Reset Filters"):
+        st.experimental_rerun()
+    filter_priority = st.multiselect("Priority:", df["Priority"].unique(), default=df["Priority"].unique())
+    filter_category = st.multiselect("Category:", df["Category"].unique(), default=df["Category"].unique())
 
 # Filtered tasks based on sidebar
 filtered_df = df[(df['Priority'].isin(filter_priority)) & (df['Category'].isin(filter_category))]
@@ -115,7 +127,7 @@ with col1:
         for task in tasks_to_display:
             description = task['Description']
             sentiment_score = TextBlob(description).sentiment.polarity
-            sentiment = "😊 Positive" if sentiment_score > 0.2 else "😟 Negative" if sentiment_score < -0.2 else "😐 Neutral"
+            sentiment = "Positive" if sentiment_score > 0.2 else "Negative" if sentiment_score < -0.2 else "Neutral"
             task_priority_display = f"<span style='color:red;font-weight:bold;'>🔴 {task['Priority']}</span>" if task['Priority'] == "High" else task['Priority']
             similarity_display = f" | <b>Similarity Score:</b> {task['Similarity']}" if 'Similarity' in task else ""
 
