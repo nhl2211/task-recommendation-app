@@ -6,21 +6,38 @@ from textblob import TextBlob
 
 # Load dataset
 df = pd.read_csv("task_recommendation_dataset.csv")
+df['Description'] = df['Description'].astype(str).str.lower()
 
 # TF-IDF Vectorization
+from nltk.corpus import stopwords
+from nltk.tokenize import word_tokenize
+import nltk
+nltk.download('punkt')
+nltk.download('stopwords')
+stop_words = set(stopwords.words('english'))
+
+def clean_text(text):
+    words = word_tokenize(text)
+    return ' '.join([w for w in words if w.isalnum() and w not in stop_words])
+
+df['Cleaned_Description'] = df['Description'].apply(clean_text)
 vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['Description'])
+tfidf_matrix = vectorizer.fit_transform(df['Cleaned_Description'])
 cosine_sim = cosine_similarity(tfidf_matrix)
 
 # Streamlit UI setup
 st.set_page_config(page_title="AI Task Recommender", layout="wide")
 st.markdown("""
     <style>
+    body {
+        background-color: #121212;
+        color: #e0e0e0;
+    }
     .main {
-        background-color: #fdfcfa;
+        background-color: #121212;
     }
     .stButton>button {
-        background-color: #4b0082;
+        background-color: #673ab7;
         color: white;
         font-weight: 600;
         border-radius: 6px;
@@ -28,24 +45,24 @@ st.markdown("""
         transition: 0.3s ease;
     }
     .stButton>button:hover {
-        background-color: #360060;
+        background-color: #512da8;
     }
     .recommendation-box {
-        background-color: #f9f8ff;
-        border: 1px solid #c5baf5;
+        background-color: #1e1e1e;
+        border: 1px solid #3c3c3c;
         border-radius: 10px;
         padding: 15px;
         margin-bottom: 15px;
-        box-shadow: 0 2px 5px rgba(76, 0, 130, 0.1);
+        box-shadow: 0 2px 5px rgba(0,0,0,0.2);
     }
     .header-text {
         font-size: 1.7rem;
-        color: #4b0082;
+        color: #bb86fc;
     }
     .info-panel {
         font-size: 0.9em;
         padding-top: 1em;
-        color: #444;
+        color: #cccccc;
     }
 </style>
 """, unsafe_allow_html=True)
@@ -55,9 +72,7 @@ st.markdown("Use AI to generate personalized task suggestions for team members b
 
 # Sidebar filters
 with st.sidebar:
-    st.header("📊 Priority Summary")
-    priority_counts = df['Priority'].value_counts()
-    st.bar_chart(priority_counts)
+    
 
     st.header("🔍 Customize Filters")
     users = df["Assigned To"].unique().tolist()
