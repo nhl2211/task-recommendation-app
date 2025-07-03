@@ -23,7 +23,7 @@ def clean_text(text):
 
 df['Cleaned_Description'] = df['Description'].apply(clean_text)
 vectorizer = TfidfVectorizer(ngram_range=(1, 2), stop_words='english')
-tfidf_matrix = vectorizer.fit_transform(df['Cleaned_Description'])
+tfidf_matrix = vectorizer.fit_transform(df['Description'])
 cosine_sim = cosine_similarity(tfidf_matrix)
 
 # Streamlit UI setup
