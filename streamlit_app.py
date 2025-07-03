@@ -73,7 +73,7 @@ st.markdown("""
 </style>
 """, unsafe_allow_html=True)
 
-st.markdown("<h2 class='header-text'>🤖 AI-Powered Task Recommendation System</h2>", unsafe_allow_html=True)
+st.markdown("<h3 class='header-text'>🤖 AI-Powered Task Recommendation System</h3>", unsafe_allow_html=True)
 st.markdown("Use AI to generate personalized task suggestions for team members based on task descriptions, category, and priority.")
 
 # Sidebar filters
